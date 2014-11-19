@@ -1,0 +1,26 @@
+{%if with_layout%} {%include "layout/header.html"%} {% endif %} 
+
+{% if comments|length%}
+<table class="table table-bordered">
+	{%for comment in comments %}
+	<tr>
+		<td>		
+				<form method="post" action="/blog/del/comment">
+					{% csrf_token %}
+					<input type="hidden" name="id" id="id" value="{{comment.id}}" />
+					<div class="text-right"> {{comment.created}}</div>
+					{{comment.Name}} write it.
+					<div class="pull-right"><input type="submit" value="delete" /></div>
+					<p>{{comment.Content}}</p>
+					 
+				</form>
+		</td>
+	</tr>
+	{%endfor%}
+	
+</table>
+{%else%} no comments. 
+{%endif%} {%include "comment_form.html"%} 
+{%if with_layout%} 
+{%include "layout/footer.html"%} 
+{% endif %}

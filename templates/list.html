@@ -1,0 +1,40 @@
+{% include "layout/header.html"%}
+<div class="page-header">
+	<h1>{{page_title}}</h1>
+</div>
+<div>
+
+	{%for entry in entries%}
+	<div class="row">
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<p class="pull-right">Category : {{entry.Category.Title}}</p>	
+				<h2>
+					<a href="/blog/entry/{{entry.id}}">{{entry.Title}}</a>
+
+				</h3>					
+  				<div style="padding-bottom:10px;">	{{entry.Content}}</div>				
+				<p class="pull-right">
+								Tag : {%for tag in entry.Tags.all%} <span>{{tag.Title}}</span>
+						{%endfor%}
+				</p>
+				<ul class="list-inline"><li><a href="#">{{entry.created}}</a></li><li><a href="/blog/get/comments/{{entry.id}}/"
+						onclick="toggle_comment_box(this.href, '{{entry.id}}'); return false;"><i class="glyphicon glyphicon-comment"></i>
+				Comment({{entry.Comments}})</a></li></ul>
+				
+				<div id="comment_box_{{entry.id}}" style="display: none;"></div>
+			</div>
+		</div>
+	</div>
+	{%endfor%}
+</div>
+
+<ul class="pagination">
+	<li><a href="#">«</a></li> {%for i in total_page%}
+	<li><a href="/blog/page/{{i}}">{{i}}</a></li> {%endfor%}
+	<li><a href="#">»</a></li>
+</ul>
+
+
+
+{%include "layout/footer.html" %}
