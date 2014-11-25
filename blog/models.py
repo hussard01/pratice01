@@ -1,5 +1,10 @@
 from django.db import models
 
+class User(models.Model):
+    Email  = models.CharField(max_length=80, null=False)
+    Password = models.CharField(max_length=32, null=False)
+    Created = models.DateTimeField(auto_now_add=True, auto_now=True)
+
 class Categories(models.Model):
     Title = models.CharField(max_length=40, null=False)    
     

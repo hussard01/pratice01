@@ -28,3 +28,10 @@ var add_comment = function(form_el){
 	                }
 	  });
 }
+
+var del_comment = function(button){	
+	$(button).closest('#del_comment').find('#password_form').slideDown('slow', function(){	
+		$(this).css('display', '');
+	});
+	$(button).remove();
+}

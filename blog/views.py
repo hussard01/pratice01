@@ -1,7 +1,7 @@
 #from django.shortcuts import render
  #-*- coding: utf-8 -*-
 from django.http.response import HttpResponse, HttpResponseRedirect
-from blog.models import Entries, Categories, TagModel, Comments
+from blog.models import Entries, Categories, TagModel, Comments, User
 from django.template import Context, loader
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_exempt
@@ -132,8 +132,8 @@ def add_post(request):
         except:
             return HttpResponse("error is occured")
     
-    
-    return HttpResponse("success to write number %s" % new_entry.id)
+    return HttpResponseRedirect("/blog")
+    #return HttpResponse("success to write number %s" % new_entry.id)
 
 def add_comment(request):
     cmt_name = request.POST.get('name', '')
@@ -189,25 +189,109 @@ def get_comments(request, entry_id=None, is_inner=False):
         return tpl.render(ctx)
     else:
         return HttpResponse(tpl.render(ctx))
+   
+
+def del_comment(request):
+    """
+    if request.POST.has_key('entry_id') == False:
+        return HttpResponse('select the article')
+    else:
+        try:
+            entry = Entries.objects.get(id=request.POST['entry_id'])
+        except:
+            return HttpResponse('nothing')
+    """ 
+    if request.POST.has_key('id') == False:
+        return HttpResponse('fail to delete')
+    else:
+        del_comment = Comments.objects.get(id=request.POST['id'])
+        #if request.POST['password'] == del_comment.Password:            
+        del_comment.delete()                
+        return HttpResponse('success to delete')
+    return HttpResponse('fail to delete')
+
+def joinform(request):
+    page_title = 'Joinform'
     
+    tpl = loader.get_template('join_form.html')
+
+    ctx = Context({
+            'page_title' : page_title,
+    })
+  
+    return HttpResponse(tpl.render(ctx))
+    
+@csrf_exempt
+def join(request):
+    if request.POST.has_key("email")==False:
+        return HttpResponse("no email")
+    else:
+        if len(request.POST['email']) == 0:
+            return HttpResponse("enter the email")
+        else:
+            email = request.POST['email']
+            
+    if request.POST.has_key("password")==False:
+        return HttpResponse("no password")
+    else:
+        if len(request.POST['password']) == 0:
+            return HttpResponse("enter the email")
+        else:
+            password = request.POST['password']
+    
+    try:
+        user = User(Email=email, Password=password)
+        user.save()
+        return HttpResponseRedirect('/login_form')
+        
+    except:
+        return HttpResponse("failed to join")
+    
+    return HttpResponse("failed to join")
+
+def loginform(request):
+    page_title = 'Loginform'
+    
+    tpl = loader.get_template('login_form.html')
+
+    ctx = Context({
+            'page_title' : page_title,
+    })
+  
+    return HttpResponse(tpl.render(ctx))
+
+@csrf_exempt    
 def login(request):
-    request.session['blog_login_session'] = 'guest'
-    return HttpResponse('[%s] logged in successfully' % request.session['blog_login_session'])
+    if request.POST.has_key("email")==False:
+        return HttpResponse("no email")
+    else:
+        if len(request.POST['email']) == 0:
+            return HttpResponse("enter the email")
+        else:
+            email = request.POST['email']
+            
+    if request.POST.has_key("password")==False:
+        return HttpResponse("no password")
+    else:
+        if len(request.POST['password']) == 0:
+            return HttpResponse("enter the email")
+        else:
+            password = request.POST['password']
+    
+    try:
+        user = User.objects.get(Email=email)
+        if(user.Password != password):
+            return HttpResponse('wrong password')
+        else:
+            request.session['blog_login_session'] = 'guest'
+            return HttpResponse('[%s] logged in successfully' % request.session['blog_login_session'])             
+    except:
+        HttpResponse("don't have Email")
+    
+    return HttpResponseRedirect('/login')    
 
 def logout(request):
     del request.session['blog_login_session']
     return HttpResponse('logged out successfully')
 
-   
-"""
-def del_comment(request):
-    if request.POST.has_key('id') == False:
-        return HttpResponse('fail to delete')
-    else:
-        del_comment = Comments.objects.get(id=request.POST['id'])
-        if request.POST['password'] == del_comment.Password:
-            del_comment.delete()
-            return HttpResponse('success to delete')
-    return HttpResponse('fail to delete')
-    
-"""
+

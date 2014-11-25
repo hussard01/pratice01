@@ -4,16 +4,21 @@
 <table class="table table-bordered">
 	{%for comment in comments %}
 	<tr>
-		<td>		
+		<td>				
 				<form method="post" action="/blog/del/comment">
 					{% csrf_token %}
 					<input type="hidden" name="id" id="id" value="{{comment.id}}" />
 					<div class="text-right"> {{comment.created}}</div>
 					{{comment.Name}} write it.
-					<div class="pull-right"><input type="submit" value="delete" /></div>
-					<p>{{comment.Content}}</p>
-					 
-				</form>
+					<div class="pull-right" id="del_comment">
+						<button type="button" id="del_button" class="close" aria-hidden="true" onclick="del_comment(this)">x</button>						
+						<div id="password_form" style="display:none;">							
+							<input type="password" id="password" name="password" class="form-control" placeholder="Password">							
+							<input type="submit" class="btn btn-default" value="del"/>							
+						</div>
+					</div>
+					<p>{{comment.Content}}</p>										 
+				</form>			
 		</td>
 	</tr>
 	{%endfor%}

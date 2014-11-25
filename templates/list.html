@@ -2,10 +2,9 @@
 <div class="page-header">
 	<h1>{{page_title}}</h1>
 </div>
-<div>
-
+<div class="row">
+	<div class="col-md-12">
 	{%for entry in entries%}
-	<div class="row">
 		<div class="panel panel-default">
 			<div class="panel-body">
 				<p class="pull-right">Category : {{entry.Category.Title}}</p>	
@@ -25,16 +24,24 @@
 				<div id="comment_box_{{entry.id}}" style="display: none;"></div>
 			</div>
 		</div>
-	</div>
 	{%endfor%}
+	</div>
 </div>
 
-<ul class="pagination">
-	<li><a href="#">«</a></li> {%for i in total_page%}
-	<li><a href="/blog/page/{{i}}">{{i}}</a></li> {%endfor%}
-	<li><a href="#">»</a></li>
-</ul>
+<div class="row">
+	<div class="col-md-1 col-md-offset-11">
+		<a href="write"><button type="button" class="btn btn-primary">Write</button></a>
+	</div>			
+</div>
 
-
+<div class="row">
+	<div class="col-md-6 col-md-offset-5">
+		<ul class="pagination">
+			<li><a href="#">«</a></li> {%for i in total_page%}
+			<li><a href="/blog/page/{{i}}">{{i}}</a></li> {%endfor%}
+			<li><a href="#">»</a></li>
+		</ul>
+	</div>
+</div>
 
 {%include "layout/footer.html" %}

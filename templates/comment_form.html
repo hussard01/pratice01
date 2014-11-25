@@ -1,18 +1,19 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>write comment form</title>
-</head>
-<body>
 <div class="row">
-<form method="post" action="/blog/add/comment" onsubmit="add_comment(this); return false;">{% csrf_token %}
-	<input type="hidden" name="entry_id" value="{{current_entry.id}}" />
-	<div class="input-group"><input type="text" class="form-control" id="name" name="name" placeholder="Writer"><input type="password" id="password" name="password" class="form-control" placeholder="Password">	
+	<div class="col-md-12">
+		<form class="form-inline" role="form" method="post" action="/blog/add/comment" onsubmit="add_comment(this); return false;">
+		{% csrf_token %}
+			<div class="form-group">
+	    		<div class="input-group">
+					<input type="hidden" name="entry_id" value="{{current_entry.id}}" />
+				
+					<input type="text" class="form-control" id="name" name="name" placeholder="Writer">
+					<input type="password" id="password" name="password" class="form-control" placeholder="Password">	
+				
+				<textarea class="form-control" rows="3" id="content" name="content"></textarea>
+				<button type="submit" class="btn btn-default">Sign in</button>
+				<p><input type="submit" value="submit"/></p>
+				</div>
+			</div>
+		</form>
 	</div>
-	<p><textarea id="content" name="content"></textarea></p>
-	<p><input type="submit" value="submit"/></p>	
-</form>
 </div>
-</body>
-</html>

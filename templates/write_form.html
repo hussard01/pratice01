@@ -1,20 +1,24 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>{{page_title}}</title>
-</head>
-<body>
+{% include "layout/header.html"%}
 	<form method="post" action="/blog/add/post">{% csrf_token %}
-		<p><label for="title">Title</label><input type="text" id="title" name="title" value=""/></p>
-		<p><label for="category">Category</label><select name="category" id="category">
+		<p><label for="title">Title</label><input type="text" class="form-control" placeholder="Title input" name="title"></p>
+		<p><label for="category">Category</label><select name="category" class="form-control">
 		{%for category in categories%}
 			<option value="{{category.id}}">{{category.Title}}</option>
 		{% endfor %}
 		</select></p>
-		<p><label for="tags">Tags</label><input type="text" id="tags" name="tags"/></p>
-		<p><textarea id ="content" name="content"></textarea></p>
-		<p><input type="submit" value="submit"/></p>
+		<p><label for="tags">Tags</label><input type="text" class="form-control" placeholder="Tags input" name="tags"/></p>
+		<p><label for="tags">Text</label>
+			<textarea class="form-control" rows="3" id ="content" name="content"></textarea></p>
+		
+		<div class="row">
+			<div class ="col-md-12" >
+				<div class="pull-right">
+				<button type="submit" class="btn btn-primary">Submit</button>
+				<a href="/blog">
+					<button type="button" class="btn btn-default">list</button>
+				</a>
+				</div>
+			</div>
+		</div>		
 	</form>
-</body>
-</html>
+{%include "layout/footer.html" %}

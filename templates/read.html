@@ -1,24 +1,26 @@
 {% include "layout/header.html"%}
-<div id="content">
 	<div class="row">
+		<div class="col-md-12">
 		<div class="panel panel-default">
+			<div class="panel-heading">			
+				<div class="panel-title">
+					<h3><a href="/blog/entry/{{current_entry.id}}">{{current_entry.Title}}</a>
+					<span class="pull-right"><small> Posted by {{current_entry.created}}</small></span></h3>
+				</div>
+			</div>
 			<div class="panel-body">
-				<p class="pull-right">{{current_entry.Category.Title}}</p>
-				<h2>
-					<a href="/blog/entry/{{current_entry.id}}">{{current_entry.Title}}</a>
-				</h2>
 
+				{{current_entry.Content}}
 
-				<div class="post_meta">{{current_entry.Content}}</div>
-
-				<p class="pull-right">
+			</div>
+			<div class="panel-footer">
+				<p>{{current_entry.Category.Title}}
+				<span class="pull-right">
 					{%for tag in current_entry.Tags.all%} <span>{{tag.Title}}</span>
 					{%endfor%}
-				</p>
-				<ul class="list-inline">
-					<li>{{current_entry.created}}</li>
-				</ul>
-			</div>
+				</span>
+			   	</p>
+			</div>		
 		</div>
 
 		<div id="comment_box_{{current_entry.id}}" style="display: block;">
@@ -26,13 +28,16 @@
 		<div>
 			<a href="/blog"><input type="button" value="list"> </a>
 		</div>
-		<ul>
+		
+		<nav>
+		  <ul class="pager">
 			{% if prev_entry %}
-			<li><a href="/blog/entry/{{prev_entry.id}}">prev :
-					{{prev_entry.Title}}</a></li> {% endif %} {% if next_entry %}
-			<li><a href="/blog/entry/{{next_entry.id}}">next :
-					{{next_entry.Title}}</a></li> {% endif %}
-		</ul>
-	</div>
-
+		    <li class="previous">><a href="/blog/entry/{{prev_entry.id}}">Previous</a></li>
+		    {% endif %} {% if next_entry %}
+		    <li class="next">><a href="/blog/entry/{{next_entry.id}}">Next</a></li>
+		    {% endif %}
+		  </ul>
+		</nav>
+		</div>
+	</div>	
 	{%include "layout/footer.html" %}
