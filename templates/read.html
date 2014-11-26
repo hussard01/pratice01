@@ -23,18 +23,19 @@
 			</div>		
 		</div>
 
-		<div id="comment_box_{{current_entry.id}}" style="display: block;">
-			{% include 'comments.html' %}</div>
+		<div id="comment_box_{{current_entry.id}}" sstyle="display:block;">
+			{% include 'comments.html' %}
+		</div>
 		<div>
-			<a href="/blog"><input type="button" value="list"> </a>
+			<a href="/blog"><button class="btn btn-default">List</button></a>
 		</div>
 		
 		<nav>
 		  <ul class="pager">
 			{% if prev_entry %}
-		    <li class="previous">><a href="/blog/entry/{{prev_entry.id}}">Previous</a></li>
+		    <li class="previous"><a href="/blog/entry/{{prev_entry.id}}">Previous</a></li>
 		    {% endif %} {% if next_entry %}
-		    <li class="next">><a href="/blog/entry/{{next_entry.id}}">Next</a></li>
+		    <li class="next"><a href="/blog/entry/{{next_entry.id}}">Next</a></li>
 		    {% endif %}
 		  </ul>
 		</nav>

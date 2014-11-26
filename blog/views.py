@@ -1,11 +1,15 @@
 #from django.shortcuts import render
  #-*- coding: utf-8 -*-
 from django.http.response import HttpResponse, HttpResponseRedirect
-from blog.models import Entries, Categories, TagModel, Comments, User
+from blog.models import Entries, Categories, TagModel, Comments
 from django.template import Context, loader
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_exempt
-from django.utils import simplejson
+#from django.utils import simplejson
+import json
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 
 #import md5
 
@@ -72,6 +76,7 @@ def read(request, entry_id=None):
     
     return HttpResponse(tpl.render(ctx))
 
+@login_required(login_url='/login_form')
 def write(request):
     page_title = 'write article!!!!!!!!!!!'
     
@@ -156,22 +161,24 @@ def add_comment(request):
             entry = Entries.objects.get(id=request.POST['entry_id'])
         except:
             return HttpResponse('nothing')
-    
+        
+
     try:
-        if request.is_ajax():        
-            new_cmt = Comments(Name=cmt_name, Password=cmt_password, Content=cmt_content, Entry=entry)
-            new_cmt.save()
-            entry.Comments += 1
-            entry.save()
-            
-       
-            return_data = {
-                'entry_id' : entry.id,
-                'msg': get_comments(request, entry.id, True),
-            }
-            return HttpResponse(simplejson.dumps(return_data))
-        else:
-            return HttpResponseRedirect('/blog/')
+        # if request.is_ajax:
+        new_cmt = Comments(Name=cmt_name, Password=cmt_password, Content=cmt_content, Entry=entry)
+        new_cmt.save()
+        entry.Comments += 1
+        entry.save()
+        
+   
+        return_data = {
+            'entry_id' : entry.id,
+            'msg': get_comments(request, entry.id, True),
+        }
+        
+        print entry.id, new_cmt.Name, new_cmt.Password
+        return HttpResponse(json.dumps(return_data), content_type='application/json')
+        
     except:
         return HttpResponse('fail to write1')
     return HttpResponse('fail to write2')
@@ -240,14 +247,14 @@ def join(request):
             password = request.POST['password']
     
     try:
-        user = User(Email=email, Password=password)
+        user = User.objects.create_user('none', email=email, password=password)
         user.save()
         return HttpResponseRedirect('/login_form')
         
     except:
-        return HttpResponse("failed to join")
+        return HttpResponse("failed to join1")
     
-    return HttpResponse("failed to join")
+    return HttpResponse("failed to join2")
 
 def loginform(request):
     page_title = 'Loginform'
@@ -261,37 +268,44 @@ def loginform(request):
     return HttpResponse(tpl.render(ctx))
 
 @csrf_exempt    
-def login(request):
-    if request.POST.has_key("email")==False:
-        return HttpResponse("no email")
+def loginAction(request):
+   # if 'email' in request.POST:
+   #     return HttpResponse("no email123")
+   # else:
+    if len(request.POST['email']) == 0:
+        return HttpResponse("enter the email")
     else:
-        if len(request.POST['email']) == 0:
-            return HttpResponse("enter the email")
-        else:
-            email = request.POST['email']
+        email = request.POST['email']
+        print email
             
-    if request.POST.has_key("password")==False:
-        return HttpResponse("no password")
+#    if 'password' in request.POST:
+#        return HttpResponse("no password")
+#    else:
+    if len(request.POST['password']) == 0:
+        return HttpResponse("enter the email")
     else:
-        if len(request.POST['password']) == 0:
-            return HttpResponse("enter the email")
-        else:
-            password = request.POST['password']
+        password = request.POST['password']
     
     try:
-        user = User.objects.get(Email=email)
-        if(user.Password != password):
-            return HttpResponse('wrong password')
+        
+        #user = User.objects.get(email=email)
+        
+        user = authenticate(username = 'none', password = password)        
+        
+        if user.is_active:
+            print ("here1")
+            login(request, user)
+            print ("here2")
+            return HttpResponse('logged in successfully')
         else:
-            request.session['blog_login_session'] = 'guest'
-            return HttpResponse('[%s] logged in successfully' % request.session['blog_login_session'])             
+            return HttpResponse('wrong password')             
     except:
         HttpResponse("don't have Email")
     
-    return HttpResponseRedirect('/login')    
+    return HttpResponseRedirect('/login_form')    
 
 def logout(request):
-    del request.session['blog_login_session']
+    logout(request)
     return HttpResponse('logged out successfully')
 
 

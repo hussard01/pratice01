@@ -37,10 +37,8 @@ urlpatterns = patterns('',
     
     #login
     url(r'login_form', 'blog.views.loginform'),
-    url(r'login', 'blog.views.login'),
-    url(r'logout', 'blog.views.logout'),
-    
-    
+    url(r'login', 'blog.views.loginAction'),
+    url(r'logout', 'blog.views.logout'),      
             
     #img, video    
     url(r'^media/(?P<path>.*)$', 'django.views.static.serve',{'document_root': settings.MEDIA_ROOT}),    
