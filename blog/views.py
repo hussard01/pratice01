@@ -164,20 +164,19 @@ def add_comment(request):
         
 
     try:
-        # if request.is_ajax:
-        new_cmt = Comments(Name=cmt_name, Password=cmt_password, Content=cmt_content, Entry=entry)
-        new_cmt.save()
-        entry.Comments += 1
-        entry.save()
-        
-   
-        return_data = {
-            'entry_id' : entry.id,
-            'msg': get_comments(request, entry.id, True),
-        }
-        
-        print entry.id, new_cmt.Name, new_cmt.Password
-        return HttpResponse(json.dumps(return_data), content_type='application/json')
+        if request.is_ajax:
+            new_cmt = Comments(Name=cmt_name, Password=cmt_password, Content=cmt_content, Entry=entry)
+            new_cmt.save()
+            entry.Comments += 1
+            entry.save()
+            
+       
+            return_data = {
+                'entry_id' : entry.id,
+                'msg': get_comments(request, entry.id, True),                
+            }
+            
+            return HttpResponse(json.dumps(return_data), content_type='application/json')
         
     except:
         return HttpResponse('fail to write1')
@@ -220,6 +219,13 @@ def del_comment(request):
 def joinform(request):
     page_title = 'Joinform'
     
+    ##add duplicated email check
+  #  if request.is_ajax():
+    
+
+    
+        
+    
     tpl = loader.get_template('join_form.html')
 
     ctx = Context({
@@ -230,6 +236,7 @@ def joinform(request):
     
 @csrf_exempt
 def join(request):
+   
     if request.POST.has_key("email")==False:
         return HttpResponse("no email")
     else:
@@ -237,7 +244,15 @@ def join(request):
             return HttpResponse("enter the email")
         else:
             email = request.POST['email']
-            
+
+            if request.is_ajax():
+                email_flag = User.objects.filter(email=email)
+                if email_flag:                    
+                    return HttpResponse(False)
+                else:
+                    return HttpResponse(True)
+                
+        
     if request.POST.has_key("password")==False:
         return HttpResponse("no password")
     else:
@@ -247,10 +262,10 @@ def join(request):
             password = request.POST['password']
     
     try:
-        user = User.objects.create_user('none', email=email, password=password)
+        user = User.objects.create_user('none1', email=email, password=password)
         user.save()
         return HttpResponseRedirect('/login_form')
-        
+            
     except:
         return HttpResponse("failed to join1")
     

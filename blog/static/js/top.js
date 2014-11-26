@@ -4,9 +4,7 @@ var toggle_comment_box = function(url, entry_id){
 	
 	if(el.is(":visible")){
 		el.hide();
-		console.log("C")
 	}else{		
-		console.log("a")
 		$.ajax({
 			url : url,
 			success : function(data){
@@ -15,7 +13,6 @@ var toggle_comment_box = function(url, entry_id){
 		});
 		el.show();
 	}
-
 }
 
 var add_comment = function(form_el){
@@ -28,7 +25,6 @@ var add_comment = function(form_el){
     	data : form_el.serialize(),
     	dataType: 'json',
     	success : function(data){
-    		console.log(data);
     		var _result = data;
     		$('#comment_box_'+_result['entry_id']).empty();
     		$('#comment_box_'+_result['entry_id']).prepend(_result['msg']);
