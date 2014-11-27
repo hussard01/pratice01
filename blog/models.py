@@ -5,19 +5,24 @@ class User(models.Model):
     Password = models.CharField(max_length=32, null=False)
     Created = models.DateTimeField(auto_now_add=True, auto_now=True)
 """
+
+class Blog(models.Model):    
+    BlogId = models.CharField(max_length=30, null=False)
+    Name = models.CharField(max_length=30, null=True)    
+
 class Categories(models.Model):
     Title = models.CharField(max_length=40, null=False)    
     
 class TagModel(models.Model):
     Title = models.CharField(max_length=20, null=False)
 
-
 class Entries(models.Model):
+    Code = models.ForeignKey(Blog)
     Title = models.CharField(max_length=80, null=False)
     Content = models.TextField(null=False)
     created = models.DateTimeField(auto_now_add=True, auto_now=True)
     Category = models.ForeignKey(Categories)
-    Tags = models.ManyToManyField(TagModel)
+    Tags = models.ManyToManyField(TagModel)    
     Comments = models.PositiveSmallIntegerField(default=0, null=True)
 
 class Comments(models.Model):

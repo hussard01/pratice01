@@ -13,24 +13,24 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 urlpatterns = patterns('',
     # Examples:
     # url(rd'^$', 'mysite.views.home', name='home'),
+        #admin
+    url(r'^admin/', include(admin.site.urls)),
     
     #basic
     url(r'index/$', TemplateView.as_view(template_name='index.html')),
     url(r'^$', TemplateView.as_view(template_name='index.html')),
     
     #blog
-    url(r'^blog/$', 'blog.views.index'),
-    url(r'^blog/page/(?P<page>\d+)', 'blog.views.index'),    
+    url(r'^blog/$', 'blog.views.list'),
+    #url(r'^blog/(?P<blogid>\d+)', 'blog.views.list'),
+    url(r'^blog/page/(?P<page>\d+)', 'blog.views.list'),    
     url(r'^blog/entry/(?P<entry_id>\d+)', 'blog.views.read'),
     url(r'^blog/write', 'blog.views.write'),
     url(r'^blog/add/post', 'blog.views.add_post'),
     url(r'^blog/add/comment', 'blog.views.add_comment'),
     url(r'^blog/del/comment', 'blog.views.del_comment'),
     url(r'^blog/get/comments/(?P<entry_id>\d+)', 'blog.views.get_comments'),
-    
-    #admin
-    url(r'^admin/', include(admin.site.urls)),
-    
+       
     #join
     url(r'join_form', 'blog.views.joinform'),
     url(r'join', 'blog.views.join'),

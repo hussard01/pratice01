@@ -14,12 +14,13 @@ from django.contrib.auth.decorators import login_required
 #import md5
 
 # Create your views here.
-def index(request, page=1):
+def list(request,  page=1):
     page_title = "blog article list"    
     
     if isinstance(page, int) == False:
         page=1
         
+  # blogid=1,
     page = int(page)
     
     per_page = 5
@@ -76,7 +77,7 @@ def read(request, entry_id=None):
     
     return HttpResponse(tpl.render(ctx))
 
-@login_required(login_url='/login_form')
+#@login_required(login_url='/login_form')
 def write(request):
     page_title = 'write article!!!!!!!!!!!'
     
