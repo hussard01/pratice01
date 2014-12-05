@@ -22,11 +22,14 @@ urlpatterns = patterns('',
     
     #blog
     url(r'^blog/$', 'blog.views.list'),
-    #url(r'^blog/(?P<blogid>\d+)', 'blog.views.list'),
-    url(r'^blog/page/(?P<page>\d+)', 'blog.views.list'),    
-    url(r'^blog/entry/(?P<entry_id>\d+)', 'blog.views.read'),
-    url(r'^blog/write', 'blog.views.write'),
-    url(r'^blog/add/post', 'blog.views.add_post'),
+    url(r'^blog/(?P<blogid>[^\/]+)/$', 'blog.views.list'),
+    url(r'^blog/(?P<blogid>[^\/]+)/page/(?P<page>\d+)/$', 'blog.views.list'),
+    url(r'^blog/(?P<blogid>[^\/]+)/entry/(?P<entry_id>\d+)/$', 'blog.views.read'),
+    url(r'^blog/(?P<blogid>[^\/]+)/write/$', 'blog.views.write'),
+    #url(r'^blog/write', 'blog.views.write'),
+    url(r'^blog/(?P<blogid>[^\/]+)/add/post', 'blog.views.add_post'),
+    url(r'^blog/(?P<blogid>[^\/]+)/del/post/(?P<entry_id>\d+)/$', 'blog.views.del_post'),    
+    #url(r'^blog/add/post', 'blog.views.add_post'),
     url(r'^blog/add/comment', 'blog.views.add_comment'),
     url(r'^blog/del/comment', 'blog.views.del_comment'),
     url(r'^blog/get/comments/(?P<entry_id>\d+)', 'blog.views.get_comments'),
@@ -37,8 +40,9 @@ urlpatterns = patterns('',
     
     #login
     url(r'login_form', 'blog.views.loginform'),
+    #url(r'login_form\?next=(?P<next>.+)/$', 'blog.views.loginform'),
     url(r'login', 'blog.views.loginAction'),
-    url(r'logout', 'blog.views.logout'),      
+    url(r'logout', 'blog.views.logout'),
             
     #img, video    
     url(r'^media/(?P<path>.*)$', 'django.views.static.serve',{'document_root': settings.MEDIA_ROOT}),    

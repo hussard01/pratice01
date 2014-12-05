@@ -1,5 +1,5 @@
 {% include "layout/header.html"%}
-	<form method="post" action="/blog/add/post">{% csrf_token %}
+	<form method="post" action="/blog/{{blogid}}/add/post">{% csrf_token %}
 		<p><label for="title">Title</label><input type="text" class="form-control" placeholder="Title input" name="title"></p>
 		<p><label for="category">Category</label><select name="category" class="form-control">
 		{%for category in categories%}
@@ -14,7 +14,7 @@
 			<div class ="col-md-12" >
 				<div class="pull-right">
 				<button type="submit" class="btn btn-primary">Submit</button>
-				<a href="/blog">
+				<a href="/blog/{{blogid}}">
 					<button type="button" class="btn btn-default">list</button>
 				</a>
 				</div>

@@ -2,7 +2,7 @@
 	<div class="col-md-12">
 		<form role="form" method="post" action="/blog/add/comment" onsubmit="add_comment(this); return false;">
 		{% csrf_token %}
-			<input type="hidden" name="entry_id" value="{{current_entry.id}}" />			
+			<input type="hidden" id = "entry_id" name="entry_id" value="{{current_entry.id}}" />
 			<div class="row">
 				<div class="col-md-4">
 					<div class="input-group">

@@ -9,7 +9,7 @@
 			<div class="panel-body">
 				<p class="pull-right">Category : {{entry.Category.Title}}</p>	
 				<h2>
-					<a href="/blog/entry/{{entry.id}}">{{entry.Title}}</a>
+					<a href="/blog/{{blogid}}/entry/{{entry.id}}">{{entry.rownum}}.{{entry.Title}}</a>
 
 				</h3>					
   				<div style="padding-bottom:10px;">	{{entry.Content}}</div>				
@@ -30,16 +30,22 @@
 
 <div class="row">
 	<div class="col-md-1 col-md-offset-11">
-		<a href="write"><button type="button" class="btn btn-primary">Write</button></a>
+		<a href="/blog/{{blogid}}/write"><button type="button" class="btn btn-primary">Write</button></a>
 	</div>			
 </div>
 
 <div class="row">
 	<div class="col-md-6 col-md-offset-5">
 		<ul class="pagination">
-			<li><a href="#">«</a></li> {%for i in total_page%}
-			<li><a href="/blog/page/{{i}}">{{i}}</a></li> {%endfor%}
-			<li><a href="#">»</a></li>
+			{%if previous_page%}
+			<li><a href="/blog/{{blogid}}/page/{{previous_page}}">«</a></li>
+			{%endif%}			
+			{%for i in total_page%}
+			<li><a href="/blog/{{blogid}}/page/{{i}}">{{i}}</a></li> 
+			{%endfor%}
+			{%if next_page%}
+			<li><a href="/blog/{{blogid}}/page/{{next_page}}">»</a></li>
+			{%endif%}	
 		</ul>
 	</div>
 </div>

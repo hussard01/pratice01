@@ -8,6 +8,7 @@ var toggle_comment_box = function(url, entry_id){
 		$.ajax({
 			url : url,
 			success : function(data){
+				el.empty();
 				el.append(data);
 			}		
 		});
@@ -25,9 +26,10 @@ var add_comment = function(form_el){
     	data : form_el.serialize(),
     	dataType: 'json',
     	success : function(data){
-    		var _result = data;
-    		$('#comment_box_'+_result['entry_id']).empty();
-    		$('#comment_box_'+_result['entry_id']).prepend(_result['msg']);
+    		var result = data;
+    		$('#comment_box_'+result['entry_id']).empty();
+    		$('#comment_box_'+result['entry_id']).prepend(result['msg']);
+    		$('#entry_id').val(result['entry_id'])
     		/*
     		if (req.responseText.isJSON() == true ) {
                 var _result = req.responseText.evalJSON(true);

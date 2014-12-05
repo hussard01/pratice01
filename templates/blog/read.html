@@ -24,20 +24,25 @@
 		</div>
 		
 		<div class="pull-right">
-			<a href="/blog"><button class="btn btn-default">List</button></a>
+			<a href="/blog/{{blogid}}"><button class="btn btn-default">List</button></a>
+		</div>
+		
+		<div class="pull-right">
+			<a href="/blog/{{blogid}}/del/post/{{current_entry.id}}"><button class="btn btn-default">delete</button></a>
 		</div>
 
-		<div id="comment_box_{{current_entry.id}}" sstyle="display:block;">
-			{% include 'comments.html' %}
+		<div id="comment_box_{{current_entry.id}}" style="display:block;">
+			{% include 'blog/comments.html' %}
 		</div>
-
+		
+		{%include "blog/comment_form.html"%} 
 		
 		<nav>
 		  <ul class="pager">
 			{% if prev_entry %}
-		    <li class="previous"><a href="/blog/entry/{{prev_entry.id}}">Previous</a></li>
+		    <li class="previous"><a href="/blog/{{blogid}}/entry/{{prev_entry.id}}">Previous</a></li>
 		    {% endif %} {% if next_entry %}
-		    <li class="next"><a href="/blog/entry/{{next_entry.id}}">Next</a></li>
+		    <li class="next"><a href="/blog/{{blogid}}/entry/{{next_entry.id}}">Next</a></li>
 		    {% endif %}
 		  </ul>
 		</nav>

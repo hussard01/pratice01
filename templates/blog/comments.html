@@ -8,6 +8,7 @@
 				<form method="post" action="/blog/del/comment">
 					{% csrf_token %}
 					<input type="hidden" name="id" id="id" value="{{comment.id}}" />
+					<input type="hidden" name="entry_id" id="entry_id" value="{{entry_id}}" />
 					<div class="text-right"> {{comment.created}}</div>
 					{{comment.Name}} write it.
 					<div class="pull-right" id="del_comment">
@@ -25,7 +26,7 @@
 	
 </table>
 {%else%} no comments. 
-{%endif%} {%include "comment_form.html"%} 
+{%endif%} 
 {%if with_layout%} 
 {%include "layout/footer.html"%} 
 {% endif %}

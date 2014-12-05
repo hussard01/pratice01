@@ -4,7 +4,8 @@
 		<div class="page-header">
 			<h1>{{page_title}}</h1>
 		</div>
-		<form role="form" id="loginform" name="loginform" method="POST" action="/login" autocomplete="off">
+		<form role="form" id="loginform" name="loginform" method="POST" action="/login" autocomplete="off" >
+		  <!-- <input type="hidden" id="next_page" name="next_page" value="{{next}}"/> -->
 		  <div class="form-group">
 		    <label for="exampleInputEmail1">Email address</label>
 		    <input type="email" class="form-control" id="exampleInputEmail1" name="email" placeholder="Enter email">
@@ -15,13 +16,14 @@
 		  </div>
 		  <div class="checkbox">
 		    <label>
-		      <input type="checkbox"> remeber me
+		      <input type="checkbox"> 비밀번호 저장
 		    </label>
-		  </div>
-		  <span class="pull-right"><button type="submit" class="btn btn-primary">Submit</button>
-		  <a href = "/join_form"><button type="button" class="btn btn-default">Join</button></a></span>
+		  </div>		        
+			<a href = "/join_form"><button type="button" class="btn btn-default">화원가입</button></a>
+		    <span class="pull-right"><button type="submit" class="btn btn-primary">로그인</button></span>
 		</form>
 	</div>
 </div>
+
 
 {%include "layout/footer.html" %}
