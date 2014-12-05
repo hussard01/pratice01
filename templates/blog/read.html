@@ -30,6 +30,9 @@
 		<div class="pull-right">
 			<a href="/blog/{{blogid}}/del/post/{{current_entry.id}}"><button class="btn btn-default">delete</button></a>
 		</div>
+		<div class="pull-right">
+			<a href="/blog/{{blogid}}/update/form/{{current_entry.id}}"><button class="btn btn-default">수정</button></a>
+		</div>
 
 		<div id="comment_box_{{current_entry.id}}" style="display:block;">
 			{% include 'blog/comments.html' %}

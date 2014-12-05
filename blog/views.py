@@ -8,35 +8,19 @@ from django.views.decorators.csrf import csrf_exempt
 #from django.utils import simplejson
 import json
 from django.contrib.auth import authenticate
-from django.contrib.auth import login
-from django.contrib.auth import login as auth_logout
+from django.contrib.auth import login as auth_login
+from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.decorators import permission_required
-from django.shortcuts import render, render_to_response
-from django.template.context import RequestContext
-from django.template import RequestContext
+#from django.contrib.auth.decorators import permission_required
+#from django.shortcuts import render, render_to_response
+#from django.template.context import RequestContext
+
 #import md5
 
-# Create your views here.
-def list(request, page=1, blogid='common'):
+def paging(page, total_count, per_page):
     
-    page_title = blogid + " list"    
-        
-    #if isinstance(page, int) == False:
-    #    print 'aaaaaaaaaaaaa'
-    #    page=1
-     
-    # blogid=1,
-    page = int(page)
     
-    per_page = 5
-    start_pos = (page-1) * per_page
-    end_pos = start_pos + per_page
-        
-    entries = Entries.objects.filter(BlogId=blogid, Delflag='N').select_related().extra(select={'rownum': 'row_number() OVER (ORDER BY "created")'}).order_by('-created')[start_pos:end_pos]
-         
-    total_count = Entries.objects.filter(BlogId=blogid, Delflag='N').count()
     total_page = (total_count/per_page)+1
         
     #보여줄 페이지 수 계산 / 10개씩
@@ -64,7 +48,28 @@ def list(request, page=1, blogid='common'):
     if first_page+10 <= total_page :             
         next_page = first_page+10
         
-    res = total_count%per_page    
+    res = total_count%per_page
+        
+    return {'previous_page' : previous_page, 'next_page' : next_page, 'total_page2' : total_page2, 'res' :res} 
+
+# Create your views here.
+def list(request, page=1, blogid='common'):
+    
+    page_title = blogid + " list"    
+        
+    page = int(page)
+    
+    per_page = 5
+    start_pos = (page-1) * per_page
+    end_pos = start_pos + per_page
+    
+        
+    entries = Entries.objects.filter(BlogId=blogid, Delflag='N').select_related().extra(select={'rownum': 'row_number() OVER (ORDER BY "created")'}).order_by('-created')[start_pos:end_pos]
+         
+    total_count = Entries.objects.filter(BlogId=blogid, Delflag='N').count()
+    
+    cpage = paging(page, total_count, per_page)
+        
     
     tpl = loader.get_template('blog/list.html')
     
@@ -72,10 +77,10 @@ def list(request, page=1, blogid='common'):
         'page_title':page_title,
         'entries':entries,
         'current_page':page,
-        'previous_page':previous_page,
-        'next_page': next_page,
-        'total_page':total_page2,    
-        'res':res,
+        'previous_page':cpage['previous_page'],
+        'next_page': cpage['next_page'],
+        'total_page':cpage['total_page2'],    
+        'res':cpage['res'],
         'count':total_count,
         'user' : request.user,
         'blogid':blogid,     
@@ -83,20 +88,28 @@ def list(request, page=1, blogid='common'):
     
     return HttpResponse(tpl.render(ctx))
 
-@login_required(login_url='/login_form')
+@login_required(login_url='/login/form')
 def read(request, blogid='common', entry_id=None):
     page_title = 'view contents'
     
-    current_entry = Entries.objects.get(id=int(entry_id))
+    current_entry = Entries.objects.get(id=int(entry_id), Delflag='N')
+    
+    #조회수 추가
+    current_entry.Hit += 1    
+    current_entry.save()
     
     #로그인 안하면 안보이게 끔 추가
     # hit 수 추가    
     try:
         prev_entry = current_entry.get_previous_by_created()
+        if prev_entry.Delflag == 'Y':
+            prev_entry = None
     except:
         prev_entry = None
     try:
         next_entry = current_entry.get_next_by_created()
+        if next_entry.Delflag == 'Y':
+            next_entry =None
     except:
         next_entry = None
     
@@ -119,8 +132,11 @@ def read(request, blogid='common', entry_id=None):
     ctx.update(csrf(request))
     
     return HttpResponse(tpl.render(ctx))
+       
+   
+    
 
-@login_required(login_url='/login_form')
+@login_required(login_url='/login/form')
 def write(request, blogid='common'):
     page_title = 'write article!!!!!!!!!!!'
     
@@ -137,8 +153,38 @@ def write(request, blogid='common'):
     ctx.update(csrf(request))
    
     return HttpResponse(tpl.render(ctx))
+
+
+@login_required(login_url='/login/form')
+def updateform(request, blogid='common', entry_id=None):
     
-@login_required(login_url='/login_form')
+    page_title = 'update article!'
+        
+    entry = Entries.objects.get(id=int(entry_id), Delflag='N')
+    
+    if request.user.username == entry.Name:        
+        
+        categories = Categories.objects.all()
+        tpl = loader.get_template('blog/update_form.html')
+        
+        ctx = Context({
+                'page_title' : page_title,
+                'entry' : entry,
+                'blogid':blogid,
+                'categories' : categories,
+                'user' : request.user,
+        })
+        
+        ctx.update(csrf(request))
+   
+        return HttpResponse(tpl.render(ctx))
+    
+    else:
+        print "3"
+        return HttpResponseRedirect('/blog/'+blogid+'/entry/'+entry_id)
+
+    
+@login_required(login_url='/login/form')
 def add_post(request, blogid='common'):
 
     if request.POST.has_key("title")==False:
@@ -157,6 +203,10 @@ def add_post(request, blogid='common'):
         else:
             entry_content = request.POST["content"]
     
+    if request.user == False:
+        return HttpResponse('ㅁㄴㅇㄹ')
+    
+    
     try :
         entry_category = Categories.objects.get(id=request.POST['category'])
     except:
@@ -171,8 +221,7 @@ def add_post(request, blogid='common'):
     for tag in tags:
         tag_list.append(TagModel.objects.get_or_create(Title=tag)[0])
         
-    
-    new_entry = Entries(BlogId = blogid, Title=entry_title, Content=entry_content, Category=entry_category)
+    new_entry = Entries(BlogId = blogid, Name=request.user.username, Title=entry_title, Content=entry_content, Category=entry_category)
     new_entry.save()
     
     for tag in tag_list:
@@ -186,7 +235,60 @@ def add_post(request, blogid='common'):
     return HttpResponseRedirect("/blog/"+ blogid)
     #return HttpResponse("success to write number %s" % new_entry.id)
 
-@login_required(login_url='/login_form')   
+
+@csrf_exempt
+@login_required(login_url='/login/form')
+def update_post(request, blogid='common', entry_id=None):
+
+    if request.POST.has_key("title")==False:
+        return HttpResponse("write title!!!")
+    else:
+        if len(request.POST['title']) == 0:
+            return HttpResponse('글 title엔 적어도 한 글자는 넣자!')
+        else:
+            entry_title = request.POST["title"]
+    
+    if request.POST.has_key('content') == False:
+        return HttpResponse('글 본문을 입력해야 한다우.')
+    else:
+        if len(request.POST['content']) == 0:
+            return HttpResponse('글 본문엔 적어도 한 글자는 넣자!')
+        else:
+            entry_content = request.POST["content"]
+    
+    if request.user == False:
+        return HttpResponse('ㅁㄴㅇㄹ')
+        
+    try :
+        entry_category = Categories.objects.get(id=request.POST['category'])
+    except:
+        return HttpResponse('sadfasdf')
+        
+    tags = []
+    tag_list = []
+    split_tags = unicode(request.POST['tags']).split(',')
+    for tag in split_tags:
+        tags.append(tag.strip())
+    for tag in tags:
+        tag_list.append(TagModel.objects.get_or_create(Title=tag)[0])        
+     
+    Entries.objects.filter(id=entry_id).update(Title=entry_title, Content=entry_content, Category=entry_category)  
+    new_entry = Entries.objects.get(id=entry_id)  
+    
+    for tag in tag_list:        
+        new_entry.Tags.add(tag)
+    if len(tag_list) > 0:
+        try:
+            new_entry.save()
+        except:
+            return HttpResponse("error is occured")
+    
+    return HttpResponseRedirect("/blog/"+ blogid)
+    #return HttpResponse("success to write number %s" % new_entry.id)
+        
+
+
+@login_required(login_url='/login/form')   
 def del_post(request, blogid='common', entry_id=None):
 
     try:
@@ -198,13 +300,11 @@ def del_post(request, blogid='common', entry_id=None):
     except:                
         return HttpResponseRedirect("/blog/"+ blogid)
      
-@login_required(login_url='/login_form')
+@login_required(login_url='/login/form')
 def add_comment(request):
 
-        
-    cmt_name = request.POST.get('name', '')
-    if not cmt_name.strip():
-        return HttpResponse("fill out name")
+    if request.user == False:
+        return HttpResponse('ㅁㄴㅇㄹ')
     
     cmt_password = request.POST.get('password', '')
     if not cmt_password.strip():
@@ -217,6 +317,9 @@ def add_comment(request):
 
     if request.POST.has_key('entry_id') == False:
         return HttpResponse('select the article')
+    
+
+    
     else:
         try:
             entry = Entries.objects.get(id=request.POST['entry_id'])
@@ -227,7 +330,7 @@ def add_comment(request):
     
     try:
         if request.is_ajax:
-            new_cmt = Comments(Name=cmt_name, Password=cmt_password, Content=cmt_content, Entry=entry)
+            new_cmt = Comments(Name=request.user, Password=cmt_password, Content=cmt_content, Entry=entry)
             new_cmt.save()
             entry.Comments += 1
             entry.save()
@@ -246,7 +349,7 @@ def add_comment(request):
     return HttpResponse('fail to write2')
 
 @csrf_exempt
-@login_required(login_url='/login_form')
+@login_required(login_url='/login/form')
 def get_comments(request, entry_id=None, is_inner=False):
     comments = Comments.objects.filter(Entry=entry_id, Delflag='N').order_by('created')
     tpl = loader.get_template('blog/comments.html')
@@ -261,7 +364,7 @@ def get_comments(request, entry_id=None, is_inner=False):
     else:
         return HttpResponse(tpl.render(ctx))
    
-@login_required(login_url='/login_form')
+@login_required(login_url='/login/form')
 def del_comment(request):
     """
     if request.POST.has_key('entry_id') == False:
@@ -313,6 +416,22 @@ def joinform(request):
     
 @csrf_exempt
 def join(request):
+    
+    if request.POST.has_key("name")==False:
+        return HttpResponse("no name")
+    else:
+        if len(request.POST['name']) == 0:
+            return HttpResponse("enter the name")
+        else:
+            name = request.POST['name']
+
+            if request.is_ajax():
+                name_flag = User.objects.filter(name=name)
+                if name_flag:                    
+                    return HttpResponse(False)
+                else:
+                    return HttpResponse(True)
+    
    
     if request.POST.has_key("email")==False:
         return HttpResponse("no email")
@@ -341,7 +460,7 @@ def join(request):
     try:
         user = User.objects.create_user('none', email=email, password=password)
         user.save()
-        return HttpResponseRedirect('/login_form')
+        return HttpResponseRedirect('/login/form')
             
     except:
         return HttpResponse("failed to join1")
@@ -365,19 +484,25 @@ def loginform(request):
     })
     return HttpResponse(tpl.render(ctx))
 
+def loginform2(request):
+    page_title = 'Loginform2'
+    
+    tpl = loader.get_template('login_form2.html')
+    """
+    next_loginform= ''
+    
+    if request.GET.has_key('next'):        
+        if len(request.GET['next']) != 0:
+            next_loginform = request.GET['next']
+    """
+    ctx = Context({
+            'page_title' : page_title,
+    #        'next' : next_loginform,
+    })
+    return HttpResponse(tpl.render(ctx))
+
 @csrf_exempt    
 def loginAction(request, next='index'):
-   # if 'email' in request.POST:
-   #     return HttpResponse("no email123")
-   # else:
-
-    """
-    if 'next_page' in request.POST:
-        next_page = request.POST['next_page']
-        print next_page
-    else:
-        next_page = 'index'
-    """
    
     if 'email' in request.POST:
         if len(request.POST['email']) == 0:
@@ -395,12 +520,7 @@ def loginAction(request, next='index'):
     else:
         password = request.POST['password']
     try:
-        
 
-        #user = User.objects.get(email=email)
-        print "aaaaaaaaaaaaaaaaa"
-        #user = authenticate(username = 'none', password = password)        
-    #    user = authenticate(username= 'none' , email=email, password = password)
         user = authenticate(username= 'admin' , email=email, password = password)
     
         if user is not None:        
@@ -413,17 +533,17 @@ def loginAction(request, next='index'):
                     print "test"
                     request.GET['next'] = 'index'
                 """                    
-                login(request, user)
+                auth_login(request, user)
                 print ("here3")
                 #print (next_page)
-                #return HttpResponseRedirect('/index')
-                return render_to_response('layout/index.html', {'user': user}, context_instance=RequestContext(request)) 
+                return HttpResponseRedirect('/index')
+                #return render_to_response('layout/index.html', {'user': user}, context_instance=RequestContext(request)) 
             else:
                 print ("here4")
-                return HttpResponse('wrong password')
+                return HttpResponseRedirect('/login/form2')
         else:             
             print ("here5")
-            return HttpResponseRedirect('/blog') 
+            return HttpResponseRedirect('/login/form2')
             
     except:
         print ("here6")
@@ -432,10 +552,14 @@ def loginAction(request, next='index'):
     print ("here7")
     return HttpResponseRedirect('/index')    
 
-@login_required(login_url='/login_form')
+@login_required(login_url='/login/form')
 def logout(request):
     print "aaaaaaaaaaa"
     auth_logout(request)
-    #return HttpResponseRedirect('/blog')
+    return HttpResponseRedirect('/index')
 
 
+@csrf_exempt    
+@login_required(login_url='/login/form')
+def profile(request, next='index'):
+    pass

@@ -1,0 +1,31 @@
+{% include "layout/header.html"%}
+	{%if entry%}
+	<form id="write_form" method="post" action="/blog/{{blogid}}/update/post/{{entry.id}}/">{% csrf_token %}
+		<div class="form-group"><label for="title">Title</label><input type="text" class="form-control" placeholder="Title input" name="title" value="{{entry.Title}}"></div>
+		<div class="form-group"><label for="category">Category</label><select name="category" class="form-control">
+		{%for category in categories%}
+			<option value="{{category.id}}">{{category.Title}}</option>
+		{% endfor %}
+		</select></div>
+		<div class="form-group"><label for="tags">Tags</label><input type="text" class="form-control" placeholder="Tags input" name="tags" value = "{%for tag in entry.Tags.all%} {{tag.Title}} {%endfor%}"/>
+			
+		</div>
+		<div class="form-group"><label for="content">Text</label>
+			<textarea class="form-control" rows="3" name="content">{{entry.Content}}</textarea></div>
+		<div class="row">
+			<div class ="col-md-12" >
+				<div class="pull-right">
+				<button type="submit" class="btn btn-primary">Submit</button>
+				<a href="/blog/{{blogid}}/entry/{{entry.id}}">
+					<button type="button" class="btn btn-default">취소</button>
+				</a>
+				</div>
+			</div>
+		</div>		
+	</form>
+	{%else%}
+		<script>
+			location.href = 'error.html'
+		</script>
+	{%endif%}
+{%include "layout/footer.html" %}
