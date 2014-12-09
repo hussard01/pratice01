@@ -12,6 +12,7 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from blog.forms import writeForm
 #from django.contrib.auth.decorators import permission_required
 #from django.shortcuts import render, render_to_response
 #from django.template.context import RequestContext
@@ -138,12 +139,15 @@ def read(request, blogid='common', entry_id=None):
 
 @login_required(login_url='/login/form')
 def write(request, blogid='common'):
-    page_title = 'write article!!!!!!!!!!!'
     
+    writeform = writeForm(request.POST)
+    page_title = 'write article!!!!!!!!!!!'
+
     tpl = loader.get_template('blog/write_form.html')
     categories = Categories.objects.all()
 
     ctx = Context({
+            'content' : writeform['content'],
             'page_title' : page_title,
             'categories' : categories,
             'blogid':blogid,
@@ -158,12 +162,17 @@ def write(request, blogid='common'):
 @login_required(login_url='/login/form')
 def updateform(request, blogid='common', entry_id=None):
     
+    
     page_title = 'update article!'
         
     entry = Entries.objects.get(id=int(entry_id), Delflag='N')
     
     if request.user.username == entry.Name:        
+
+        updateform1 = writeForm(request.POST)        
+        updateform1.data['content'] = entry.Content
         
+ 
         categories = Categories.objects.all()
         tpl = loader.get_template('blog/update_form.html')
         
@@ -173,6 +182,7 @@ def updateform(request, blogid='common', entry_id=None):
                 'blogid':blogid,
                 'categories' : categories,
                 'user' : request.user,
+                'content' : updateform1['content'],
         })
         
         ctx.update(csrf(request))

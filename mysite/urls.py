@@ -49,6 +49,12 @@ urlpatterns = patterns('',
     url(r'login/profile', 'blog.views.profile'),
             
     #img, video    
-    url(r'^media/(?P<path>.*)$', 'django.views.static.serve',{'document_root': settings.MEDIA_ROOT}),    
+    url(r'^media/(?P<path>.*)$', 'django.views.static.serve',{'document_root': settings.MEDIA_ROOT}),        
+
+    #file browser
+    #url(r'^ckeditor/', include('ckeditor.urls')),
+    url(r'^redactor/', include('redactor.urls')),
+    
+    
 )+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 
 

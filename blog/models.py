@@ -1,4 +1,5 @@
 from django.db import models
+from redactor.fields import RedactorField   
 
 class Blog(models.Model):    
     BlogId = models.CharField(max_length=30, null=False)
@@ -13,7 +14,8 @@ class TagModel(models.Model):
 class Entries(models.Model):
     BlogId = models.CharField(max_length=20, null=False)
     Title = models.CharField(max_length=80, null=False)    
-    Content = models.TextField(null=False)
+#    Content = models.TextField(null=False)
+    Content = RedactorField()
     created = models.DateTimeField(auto_now_add=True)
     Category = models.ForeignKey(Categories)
     Tags = models.ManyToManyField(TagModel)

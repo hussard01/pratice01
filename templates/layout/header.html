@@ -9,7 +9,7 @@
 <!--  bootstrap -->
 <link href="{% static "dist/css/bootstrap.min.css" %}" rel="stylesheet" media="screen"/>
 <!-- jQuery (부트스트랩의 자바스크립트 플러그인을 위해 필요한) -->
-<script src="//code.jquery.com/jquery.js"></script>
+<script type="text/javascript" src="{% static "js/jquery-1.11.1.min.js" %}"></script>
 <!-- 제이쿼리 폼 검증 플러그인  
 <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/jquery.validate.min.js"></script>-->
 
@@ -17,12 +17,19 @@
 <link href="{% static "dist/css/bootstrapValidator.min.css" %}" rel="stylesheet" media="screen"/>
 <script type="text/javascript" src="{% static "dist/js/bootstrapValidator.min.js" %}"></script>
 
-<!-- 모든 합쳐진 플러그인을 포함하거나 (아래) 필요한 각각의 파일들을 포함하세요 -->
+<!-- 부트스트랩 플러그인  -->
 <script src="{% static "dist/js/bootstrap.min.js" %}"></script>
 
+
+ 
+<link rel="stylesheet" href="{% static "redactor/css/redactor.css" %}" />
+<script src="{% static "redactor/redactor.js"%}"></script>
+
+<!-- Custom css, js -->
 <link rel="stylesheet" href="{% static "css/style.css" %}" type="text/css" />
 <script type="text/javascript" src="{% static "js/top.js" %}"></script> 
 <script type="text/javascript" src="{% static "js/form_check.js" %}"></script>
+
 </head>
 <body>
 <div class="container">
@@ -72,7 +79,7 @@
 			</form>
 			<ul class="nav navbar-nav navbar-right">
 				{% if user.is_authenticated %}
-				<li>{{ user.username }}. Thanks for logging in. <a href="/logout">Logout</a></li>
+				<li>{{ user.username }}. Thanks for logging in. <a href="/logout/action">Logout</a></li>
 				{%else%}
 				<li><a href="/login/form">Login</a></li>
 				{%endif%}				

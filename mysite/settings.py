@@ -10,7 +10,9 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-from django.conf.global_settings import MEDIA_ROOT
+from django.conf.global_settings import STATIC_ROOT
+
+#from django.conf.global_settings import MEDIA_ROOT
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 TEMPLATE_DIRS = ( BASE_DIR + '/templates',
@@ -29,10 +31,10 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = (
+    'redactor',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,8 +42,16 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'blog',
-    'board',
+    'board',    
 )
+
+
+#wysi/wyg plugin
+REDACTOR_OPTIONS = {'lang': 'en'}
+REDACTOR_UPLOAD = 'uploads/'
+
+REDACTOR_UPLOAD_HANDLER = 'redactor.handlers.DateDirectoryUploader'
+
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -107,9 +117,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
+
+
 STATIC_URL = '/static/'
 
+STATIC_ROOT = BASE_DIR + '/static'
+
 MEDIA_ROOT =  BASE_DIR + '/media'
+
 MEDIA_URL =  '/media/'
 
 

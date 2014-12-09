@@ -1,0 +1,23 @@
+
+1.설치 
+tar xvzf 패키지명.gz -C 경로
+
+2. PATH 설정 
+export SPLUNK_HOME=/opt/splunk
+
+3.부팅시 스플렁크 시작
+ $SPLUNK_HOME/bin/splunk enable boot-start 
+
+4.포트 변경
+splunk set web-port 9000
+splunk set splunkd-port 9089
+
+5.서버 이름변경
+splunk set servername xxxx
+
+6. 저장소 변경
+splunk set datastore-dir /aaaaa
+
+7.리눅스 내 방화벽 추가
+cd /ect/sysconfig/iptables
+service iptables restart

@@ -1,0 +1,13 @@
+@CHARSET "UTF-8";
+
+.panel-heading h3{
+	margin-top:0;
+}
+
+input.error, textarea.error{
+  border:1px dashed red;
+}
+label.error{
+  display:block;
+  color:red;
+}
