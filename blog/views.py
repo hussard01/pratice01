@@ -69,8 +69,7 @@ def list(request, page=1, blogid='common'):
          
     total_count = Entries.objects.filter(BlogId=blogid, Delflag='N').count()
     
-    cpage = paging(page, total_count, per_page)
-        
+    cpage = paging(page, total_count, per_page)        
     
     tpl = loader.get_template('blog/list.html')
     
@@ -161,8 +160,7 @@ def write(request, blogid='common'):
 
 @login_required(login_url='/login/form')
 def updateform(request, blogid='common', entry_id=None):
-    
-    
+        
     page_title = 'update article!'
         
     entry = Entries.objects.get(id=int(entry_id), Delflag='N')
@@ -197,6 +195,7 @@ def updateform(request, blogid='common', entry_id=None):
 @login_required(login_url='/login/form')
 def add_post(request, blogid='common'):
 
+    #if request.method == 'Post'
     if request.POST.has_key("title")==False:
         return HttpResponse("write title!!!")
     else:

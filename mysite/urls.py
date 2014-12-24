@@ -51,10 +51,10 @@ urlpatterns = patterns('',
     #img, video    
     url(r'^media/(?P<path>.*)$', 'django.views.static.serve',{'document_root': settings.MEDIA_ROOT}),        
 
-    #file browser
-    #url(r'^ckeditor/', include('ckeditor.urls')),
+    #file browser    
     url(r'^redactor/', include('redactor.urls')),
-    
-    
+        
+    #search 
+    (r'^search/', include('haystack.urls')),
 )+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 
 
