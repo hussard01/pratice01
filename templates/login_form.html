@@ -4,11 +4,18 @@
 		<div class="page-header">
 			<h1>{{page_title}}</h1>
 		</div>
-		<form role="form" id="loginform" name="loginform" method="POST" action="/login/action" autocomplete="off" >
+
+        {% if form.errors %}
+            <p style="color: red;">
+                Please correct the error{{ form.errors|pluralize }} below.
+            </p>
+        {% endif %}
+
+		<form role="form" id="loginform" name="loginform" method="POST" action="/login/action" autocomplete="off">
 		  <!-- <input type="hidden" id="next_page" name="next_page" value="{{next}}"/> -->
 		  <div class="form-group">
-		    <label for="exampleInputEmail1">Email address</label>
-		    <input type="email" class="form-control" id="exampleInputEmail1" name="email" placeholder="Enter email">
+		    <label for="exampleInputName1">Name</label>
+		    <input type="name" class="form-control" id="exampleInputName1" name="name" placeholder="Enter name">
 		  </div>
 		  <div class="form-group">
 		    <label for="exampleInputPassword1">Password</label>

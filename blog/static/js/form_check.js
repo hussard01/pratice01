@@ -68,27 +68,28 @@ $(document).ready(function() {
             validating: 'glyphicon glyphicon-refresh'
         },
         fields: {
-		    email: {
+		    name: {
 		        validators: {
-		            notEmpty: {
-		                message: 'The email address is required and cannot be empty'
-		            },
-		            emailAddress: {
-		                message: 'The email address is not a valid'
-		            }
+                    notEmpty: {
+                        message: 'The username is required and cannot be empty'
+                    },
+                    different: {
+                        field: 'password',
+                        message: 'The username and password cannot be the same as each other'
+                    }
 		        }
 		    },
 		    password: {
 		        validators: {
 		            notEmpty: {
 		                message: 'The password is required and cannot be empty'
-		            },
+		            }
 			    }
 	        }
         }
     });
     
-    
+
     $('#joinform').bootstrapValidator({
         message: 'This value is not valid',
         feedbackIcons: {
@@ -148,6 +149,10 @@ $(document).ready(function() {
                     notEmpty: {
                         message: 'The password is required and cannot be empty'
                     },
+                    stringLength: {
+                        min: 8,
+                        message: 'The password must have at least 8 characters'
+                    },
                     identical: {
                                 field: 'password',
                                 message: 'The password and its confirm are not the same'
@@ -156,16 +161,14 @@ $(document).ready(function() {
             },
         }
     });
-     
+
 });
 
 
 
 var checkJoinName = function(A){	
-	var email = $(A).val();
-	console.log(email);
-	console.log(name);
-	// email check
+	var name = $(A).val();
+
     $.ajax({
     	url : '/join',
     	type : 'POST',
@@ -174,13 +177,14 @@ var checkJoinName = function(A){
     	success : function(data1){
     		console.log(data1);
     		var _result = data1;
-    		if(_result == 'False'){  		    		
-    			$('#duplicatedname2').css('display','none');
-    			$('#duplinamename1').css('display','');
-    		}else{    			
-    			$('#duplicatedname1').css('display','none');
-    			$('#duplicatedname2').css('display','');    			
-    		}
+
+            if(_result == 'False'){
+                    $('#duplicatedname2').css('display','none');
+                    $('#duplicatedname1').css('display','');
+                }else{
+                    $('#duplicatedname1').css('display','none');
+                    $('#duplicatedname2').css('display','');
+            }
     	} 
     })
 }
@@ -188,7 +192,6 @@ var checkJoinName = function(A){
 var checkJoinEmail = function(A){	
 	var email = $(A).val();
 	console.log(email);
-	console.log(name);
 	// email check
     $.ajax({
     	url : '/join',

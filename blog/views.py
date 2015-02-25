@@ -1,6 +1,7 @@
 #from django.shortcuts import render
  #-*- coding: utf-8 -*-
 from django.http.response import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render_to_response
 from blog.models import Entries, Categories, TagModel, Comments
 from django.template import Context, loader
 from django.core.context_processors import csrf
@@ -12,7 +13,7 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from blog.forms import writeForm
+from blog import forms
 #from django.contrib.auth.decorators import permission_required
 #from django.shortcuts import render, render_to_response
 #from django.template.context import RequestContext
@@ -139,7 +140,7 @@ def read(request, blogid='common', entry_id=None):
 @login_required(login_url='/login/form')
 def write(request, blogid='common'):
     
-    writeform = writeForm(request.POST)
+    writeform = forms.writeForm(request.POST)
     page_title = 'write article!!!!!!!!!!!'
 
     tpl = loader.get_template('blog/write_form.html')
@@ -167,7 +168,7 @@ def updateform(request, blogid='common', entry_id=None):
     
     if request.user.username == entry.Name:        
 
-        updateform1 = writeForm(request.POST)        
+        updateform1 = forms.writeForm(request.POST)
         updateform1.data['content'] = entry.Content
         
  
@@ -410,10 +411,10 @@ def del_comment(request):
 
 def joinform(request):
     page_title = 'Joinform'
-    
-    ##add duplicated email check
-  #  if request.is_ajax():    
 
+    ##add duplicated email check
+   #  if request.is_ajax():
+    print "2222222222222222222222222222222"
     
     tpl = loader.get_template('join_form.html')
 
@@ -425,139 +426,90 @@ def joinform(request):
     
 @csrf_exempt
 def join(request):
-    
-    if request.POST.has_key("name")==False:
-        return HttpResponse("no name")
-    else:
-        if len(request.POST['name']) == 0:
-            return HttpResponse("enter the name")
-        else:
-            name = request.POST['name']
 
-            if request.is_ajax():
-                name_flag = User.objects.filter(name=name)
-                if name_flag:                    
-                    return HttpResponse(False)
-                else:
-                    return HttpResponse(True)
-    
-   
-    if request.POST.has_key("email")==False:
-        return HttpResponse("no email")
-    else:
-        if len(request.POST['email']) == 0:
-            return HttpResponse("enter the email")
-        else:
-            email = request.POST['email']
+    page_title = 'Joinform'
+    print "asdfffffffffffffff1111"
 
-            if request.is_ajax():
-                email_flag = User.objects.filter(email=email)
-                if email_flag:                    
-                    return HttpResponse(False)
-                else:
-                    return HttpResponse(True)
-                
-        
-    if request.POST.has_key("password")==False:
-        return HttpResponse("no password")
+
+    if request.method == 'POST':
+
+        form = forms.joinForm(request.POST)
+
+        if request.is_ajax() and request.POST.has_key('name'):
+            print "bbbbbbbb"
+            name_flag = User.objects.filter(username=request.POST['name'])
+            if name_flag:
+                return HttpResponse(False)
+            else:
+                return HttpResponse(True)
+
+
+        if request.is_ajax() and request.POST.has_key('email'):
+            email_flag = User.objects.filter(email=request.POST['email'])
+            if email_flag:
+                return HttpResponse(False)
+            else:
+                return HttpResponse(True)
+
+        if form.is_valid():
+            data = form.cleaned_data
+
+            try:
+                user = User.objects.create_user(data['name'], email=data['email'], password=data['password'])
+                user.save()
+                return HttpResponseRedirect('/login/form')
+
+            except:
+                form.add_error(None, "중복된 아이디")
+                return render_to_response('join_form.html', {'form': form,'page_title' : page_title})
+            return render_to_response('join_form.html', {'form': form,'page_title' : page_title})
     else:
-        if len(request.POST['password']) == 0:
-            return HttpResponse("enter the email")
-        else:
-            password = request.POST['password']
-    
-    try:
-        user = User.objects.create_user('none', email=email, password=password)
-        user.save()
-        return HttpResponseRedirect('/login/form')
-            
-    except:
-        return HttpResponse("failed to join1")
-    
-    return HttpResponse("failed to join2")
+        form = forms.joinForm()
+
+    return render_to_response('join_form.html', {'form': form,'page_title' : page_title})
+
 
 def loginform(request):
     page_title = 'Loginform'
     
     tpl = loader.get_template('login_form.html')
-    """
-    next_loginform= ''
-    
-    if request.GET.has_key('next'):        
-        if len(request.GET['next']) != 0:
-            next_loginform = request.GET['next']
-    """
+
     ctx = Context({
             'page_title' : page_title,
-    #        'next' : next_loginform,
     })
     return HttpResponse(tpl.render(ctx))
 
-def loginform2(request):
-    page_title = 'Loginform2'
-    
-    tpl = loader.get_template('login_form2.html')
-    """
-    next_loginform= ''
-    
-    if request.GET.has_key('next'):        
-        if len(request.GET['next']) != 0:
-            next_loginform = request.GET['next']
-    """
-    ctx = Context({
-            'page_title' : page_title,
-    #        'next' : next_loginform,
-    })
-    return HttpResponse(tpl.render(ctx))
-
-@csrf_exempt    
+@csrf_exempt
 def loginAction(request, next='index'):
-   
-    if 'email' in request.POST:
-        if len(request.POST['email']) == 0:
-            return HttpResponse("enter the email")
-        else:
-            email = request.POST['email']
-    else:
-        print "asdfasdf"
-              
-#    if 'password' in request.POST:
-#        return HttpResponse("no password")
-#    else:
-    if len(request.POST['password']) == 0:
-        return HttpResponse("enter the password")
-    else:
-        password = request.POST['password']
-    try:
 
-        user = authenticate(username= 'admin' , email=email, password = password)
-    
-        if user is not None:        
-            if user.is_active:
-                print ("here2")
-                """                
-                print str(request.GET['next'])
-                
-                if len(request.GET['next']) == 0:
-                    print "test"
-                    request.GET['next'] = 'index'
-                """                    
-                auth_login(request, user)
-                print ("here3")
-                #print (next_page)
-                return HttpResponseRedirect('/index')
-                #return render_to_response('layout/index.html', {'user': user}, context_instance=RequestContext(request)) 
-            else:
-                print ("here4")
-                return HttpResponseRedirect('/login/form2')
-        else:             
-            print ("here5")
-            return HttpResponseRedirect('/login/form2')
-            
-    except:
-        print ("here6")
-        HttpResponse("don't have Email")
-    
+    page_title = 'Loginform'
+
+    if request.method == 'POST':
+        form = forms.loginForm(request.POST)
+
+        if form.is_valid():
+            data = form.cleaned_data
+
+            try:
+                user = authenticate(username=data['name'], password = data['password'])
+
+                if user is not None:
+                    if user.is_active:
+                        auth_login(request, user)
+                        #print (next_page)
+                        return HttpResponseRedirect('/index')
+                        #return render_to_response('layout/index.html', {'user': user}, context_instance=RequestContext(request))
+                    else:
+                        print ("here4")
+                        return HttpResponseRedirect('/login/form')
+                else:
+                    form.add_error(None, "로그인 실패")
+                    return render_to_response('login_form.html', {'form': form,'page_title' : page_title})
+
+            except:
+                form.add_error(None, "잘못된 접근")
+                return render_to_response('login_form.html', {'form': form,'page_title' : page_title})
+
     print ("here7")
     return HttpResponseRedirect('/index')    
 

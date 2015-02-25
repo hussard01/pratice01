@@ -42,7 +42,7 @@ urlpatterns = patterns('',
     
     #login
     url(r'login/form/$', 'blog.views.loginform'),
-    url(r'login/form2/$', 'blog.views.loginform2'),
+
     #url(r'login_form\?next=(?P<next>.+)/$', 'blog.views.loginform'),
     url(r'login/action', 'blog.views.loginAction'),
     url(r'logout/action', 'blog.views.logout'),

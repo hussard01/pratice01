@@ -12,9 +12,9 @@ admin.site.register(blog.models.Comments)
 admin.site.register(blog.models.TagModel)
 admin.site.register(blog.models.Blog)
 
-#u = User.objects.get(username='admin')
-#u.set_password('1234')
-#u.save()
+u = User.objects.get(username='user')
+u.set_password('1234')
+u.save()
 
 
 """

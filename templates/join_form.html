@@ -4,7 +4,14 @@
 		<div class="page-header">
 			<h1>{{page_title}}</h1>
 		</div>
-		<form role="form" id="joinform" name="joinform" method="POST" action="/join" autocomplete="off">
+
+        {% if form.errors %}
+            <p style="color: red;">
+                Please correct the error{{ form.errors|pluralize }} below.
+            </p>
+        {% endif %}
+
+		<form role="form" id="joinform" name="joinform" action="/join" method="POST" autocomplete="off">
 			<div class="form-group">
 				<label for="name">Name</label> <input type="text"
 					class="form-control" id="exampleInputName1" name="name"
@@ -40,7 +47,7 @@
 					name="password2" placeholder="Password">
 			</div>
 			<span class="pull-right"><button type="submit"
-					class="btn btn-primary">Join</button>
+					class="btn btn-primary">Join</button></span>
 		</form>
 	</div>
 </div>
