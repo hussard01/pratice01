@@ -42,11 +42,15 @@ urlpatterns = patterns('',
     
     #login
     url(r'login/form/$', 'blog.views.loginform'),
-
-    #url(r'login_form\?next=(?P<next>.+)/$', 'blog.views.loginform'),
+        #url(r'login_form\?next=(?P<next>.+)/$', 'blog.views.loginform'),
     url(r'login/action', 'blog.views.loginAction'),
     url(r'logout/action', 'blog.views.logout'),
     url(r'login/profile', 'blog.views.profile'),
+
+    #allauth
+    (r'^accounts/', include('allauth.urls')),
+    (r'^accounts/profile', 'blog.views.profile'),
+
             
     #img, video    
     url(r'^media/(?P<path>.*)$', 'django.views.static.serve',{'document_root': settings.MEDIA_ROOT}),        
@@ -55,6 +59,10 @@ urlpatterns = patterns('',
     url(r'^redactor/', include('redactor.urls')),
         
     #search 
-    (r'^search/', include('haystack.urls')),
+    url(r'^search/', include('haystack.urls')),
+    url(r'^search/form', 'blog.views.searchAction'),
+
+
+
 )+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 
 

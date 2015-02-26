@@ -6,7 +6,7 @@ from blog.models import Entries, Categories, TagModel, Comments
 from django.template import Context, loader
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_exempt
-#from django.utils import simplejson
+
 import json
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
@@ -14,6 +14,11 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from blog import forms
+
+from haystack.query import SearchQuerySet
+
+
+
 #from django.contrib.auth.decorators import permission_required
 #from django.shortcuts import render, render_to_response
 #from django.template.context import RequestContext
@@ -55,7 +60,7 @@ def paging(page, total_count, per_page):
     return {'previous_page' : previous_page, 'next_page' : next_page, 'total_page2' : total_page2, 'res' :res} 
 
 # Create your views here.
-def list(request, page=1, blogid='common'):
+def list(request, page=1, blogid='common', entries=None):
     
     page_title = blogid + " list"    
         
@@ -65,11 +70,12 @@ def list(request, page=1, blogid='common'):
     start_pos = (page-1) * per_page
     end_pos = start_pos + per_page
     
-        
-    entries = Entries.objects.filter(BlogId=blogid, Delflag='N').select_related().extra(select={'rownum': 'row_number() OVER (ORDER BY "created")'}).order_by('-created')[start_pos:end_pos]
-         
-    total_count = Entries.objects.filter(BlogId=blogid, Delflag='N').count()
-    
+    if entries == None:
+        entries = Entries.objects.filter(BlogId=blogid, Delflag='N').select_related().extra(select={'rownum': 'row_number() OVER (ORDER BY "created")'}).order_by('-created')[start_pos:end_pos]
+        total_count = Entries.objects.filter(BlogId=blogid, Delflag='N').count()
+    else :
+        entries.order_by('-created')[start_pos:end_pos]
+        total_count = entries.count()
     cpage = paging(page, total_count, per_page)        
     
     tpl = loader.get_template('blog/list.html')
@@ -507,7 +513,7 @@ def loginAction(request, next='index'):
                     return render_to_response('login_form.html', {'form': form,'page_title' : page_title})
 
             except:
-                form.add_error(None, "잘못된 접근")
+                form.add_error(None, "잘못된 접근입니다.")
                 return render_to_response('login_form.html', {'form': form,'page_title' : page_title})
 
     print ("here7")
@@ -524,3 +530,13 @@ def logout(request):
 @login_required(login_url='/login/form')
 def profile(request, next='index'):
     pass
+
+
+@csrf_exempt
+def searchAction(request):
+
+    entries = SearchQuerySet().filter(Title__contains=request.POST.get('q'))
+
+    return list(request, 1, request.POST['blogid'], entries)
+
+

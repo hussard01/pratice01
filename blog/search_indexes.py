@@ -8,17 +8,18 @@ import datetime
 from haystack import indexes
 from models import Entries
 
-class EntryIndex(indexes.SearchIndex, indexes.Indexable):
+class EntriesIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
-    title = indexes.CharField(model_attr='Title')
-    category = indexes.CharField(model_attr='Category')
-    creation_date = indexes.DateTimeField(model_attr='created')
-    content = indexes.CharField(model_attr='content')
+    Title = indexes.CharField(model_attr='Title')
+    Category = indexes.CharField(model_attr='Category')
+    created = indexes.DateTimeField(model_attr='created')
+    Content = indexes.CharField(model_attr='Content')
+    Comments = indexes.CharField(model_attr='Comments')
     
     def get_model(self):
         return Entries
 
     def index_queryset(self, using=None):
         """Used when the entire index for model is updated."""
-        return self.get_model().objects.filter(created=datetime.datetime.now())
+        return self.get_model().objects.all()
     
